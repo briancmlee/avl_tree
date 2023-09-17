@@ -1,4 +1,5 @@
 from avl import *
+import numpy as np
 
 def is_avl(root):
     if not root:
@@ -8,7 +9,9 @@ def is_avl(root):
     is_avl_right, height_right = is_avl(root.right)
     root_height = 1 + max(height_left, height_right)
 
-    assert(root.balance == height_right - height_left)
+    if root.balance != height_right - height_left:
+        print(root)
+        raise Exception("")
 
     return (abs(root.balance) <= 1), root_height
 
@@ -24,7 +27,20 @@ def simple():
         tree.delete(key)
         assert(is_avl(tree.root))
 
-all_tests = [simple]
+def random():
+    tree = Tree()
+
+    # Random numbers from 0 to 99 without duplicates
+    node_list = np.random.choice(100, 100, replace=False)
+    for key in node_list:
+        tree.insert(Node(key))
+        assert(is_avl(tree.root))
+
+    for key in node_list:
+        tree.delete(key)
+        assert(is_avl(tree.root))
+
+all_tests = [simple, random]
 
 if __name__ == '__main__':
     for test in all_tests:

@@ -1,5 +1,5 @@
 # AVL Trees
-An implementation of an AVL tree which only uses 2 extra bits per node. 
+A WIP implementation of an AVL tree which only uses 2 extra bits per node. 
 
 Background: I needed to implement an AVL tree for a dynamic memory allocator with a garbage collector in C for a course assignment. Most examples online of an AVL tree implementations either required storing the height at each node (which is not optimal for space-efficiency in a memory allocator). The Wikipedia pseudocode only used balance-factors (which requires 2 extra bits per node), but it was a bit non-intuitive to follow, with a lot of branching cases.
 
