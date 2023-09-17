@@ -36,7 +36,6 @@ def insert_node(root, node):
         root.left, subtree_height_increased = insert_node(root.left, node)
         if subtree_height_increased:
             root.balance -= 1
-            root
     elif node.key > root.key:
         root.right, subtree_height_increased = insert_node(root.right, node)
         if subtree_height_increased:
