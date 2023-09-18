@@ -50,12 +50,14 @@ def insert_node(root, node):
     # If rotated, then root.balance == 0
     # If root.balance != 0, then either 0 to -1, 1
     # Which means that the maximum of left subtree and right subtree height increased
-    tree_height_changed = subtree_height_increased and (root.balance != 0)
-    return root, tree_height_changed
+    tree_height_increased = subtree_height_increased and (root.balance != 0)
+    return root, tree_height_increased
 
 def delete_node(root, key):
     if not root:
         return None, False
+
+    init_balance = root.balance
     
     # Delete the current node
     if key == root.key:
@@ -78,9 +80,7 @@ def delete_node(root, key):
         in_order_successor.left = root.left
         in_order_successor.right = root.right
         in_order_successor.balance = root.balance
-
-        tree_height_decreased = subtree_height_decreased and (root.balance == 0)
-        return in_order_successor, tree_height_decreased
+        root = in_order_successor
     else:
         # Delete the node in the subtrees
         if key < root.key:
@@ -92,22 +92,20 @@ def delete_node(root, key):
             if subtree_height_decreased:
                 root.balance -= 1
         
-        # Rotate as necessary
-        root = balance(root)
+    # Rotate as necessary
+    root = balance(root)
 
-        tree_height_decreased = subtree_height_decreased and (root.balance == 0)
-        return root, tree_height_decreased
+    tree_height_decreased = subtree_height_decreased and (abs(init_balance) > abs(root.balance))
+    return root, tree_height_decreased
 
 def balance(root):
     if root.balance > 1:
         # Assumption: got inserted to root.right, so root.right is non-null
-        assert(root.right) 
         if root.right.balance < 0:
             root.right = right_rotate(root.right)
         root = left_rotate(root)
     elif root.balance < -1:
         # Assumption: got inserted to root.left, so root.left is non-null
-        assert(root.left)
         if root.left.balance > 0:
             root.left = left_rotate(root.left)
         root = right_rotate(root)
@@ -116,41 +114,43 @@ def balance(root):
 
 # https://cs.stackexchange.com/questions/48861/balance-factor-changes-after-local-rotations-in-avl-tree
 def left_rotate(root):
-    # left_rotate only gets called when root.balance < 0
+    # left_rotate only gets called when root.balance > 0
     # For that to be the case, there needs to be a non-null right node
     assert(root.right)
     right_child = root.right
-    
-    # assert(is_avl(root.left)[0])
-    # assert(is_avl(root.right)[0])
 
     # Rotate
     root.right = right_child.left
     right_child.left = root
 
     # Update balance factors
-    root.balance = root.balance - 1 - max(0, right_child.balance)
-    right_child.balance = right_child.balance - 1 + min(0, root.balance)
+    # root.balance = root.balance - 1 - max(0, right_child.balance)
+    # right_child.balance = right_child.balance - 1 + min(0, root.balance)
+    root.balance -= right_child.balance * (right_child.balance > 0) + 1
+    right_child.balance += root.balance * (root.balance <= 0) - 1
 
+    # right_child.balance = height(right_child.right) - height(right_child.left)
+    # root.balance = height(root.right) - height(root.left)
     return right_child
 
 def right_rotate(root):
-    # left_rotate only gets called when root.balance > 0
+    # left_rotate only gets called when root.balance < 0
     # For that to be the case, there needs to be a non-null left node
     assert(root.left)
     left_child = root.left
-
-    # assert(is_avl(root.left)[0])
-    # assert(is_avl(root.right)[0])
 
     # Rotate
     root.left = left_child.right
     left_child.right = root
 
     # Update balance factors
-    root.balance = root.balance + 1 - min(0, left_child.balance)
-    left_child.balance = left_child.balance + 1 + max(0, root.balance)
+    # root.balance = root.balance + 1 - min(0, left_child.balance)
+    # left_child.balance = left_child.balance + 1 + max(0, root.balance)
+    root.balance -= left_child.balance * (left_child.balance < 0) - 1
+    left_child.balance += root.balance * (root.balance >= 0) + 1
 
+    # left_child.balance = height(left_child.right) - height(left_child.left)
+    # root.balance = height(root.right) - height(root.left)
     return left_child
 
 

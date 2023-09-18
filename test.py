@@ -10,10 +10,9 @@ def is_avl(root):
     root_height = 1 + max(height_left, height_right)
 
     if root.balance != height_right - height_left:
-        print(root)
-        raise Exception("")
+        return False, root_height
 
-    return (abs(root.balance) <= 1), root_height
+    return is_avl_left and is_avl_right and (abs(root.balance) <= 1), root_height
 
 def simple():
     tree = Tree()
@@ -21,11 +20,11 @@ def simple():
     node_list = [1,6,2,3,7,4,9]
     for key in node_list:
         tree.insert(Node(key))
-        assert(is_avl(tree.root))
+        assert(is_avl(tree.root)[0])
 
     for key in node_list:
         tree.delete(key)
-        assert(is_avl(tree.root))
+        assert(is_avl(tree.root)[0])
 
 def random():
     tree = Tree()
@@ -34,11 +33,11 @@ def random():
     node_list = np.random.choice(100, 100, replace=False)
     for key in node_list:
         tree.insert(Node(key))
-        assert(is_avl(tree.root))
+        assert(is_avl(tree.root)[0])
 
-    for key in node_list:
+    for i, key in enumerate(node_list):
         tree.delete(key)
-        assert(is_avl(tree.root))
+        assert(is_avl(tree.root)[0])
 
 all_tests = [simple, random]
 
